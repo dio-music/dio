@@ -34,6 +34,10 @@
   filter: drop-shadow(0 0 2em #24c8db);
 }
 
+.logo.vanilla:hover {
+  filter: drop-shadow(0 0 2em #ffe21c);
+}
+
 .row {
   display: flex;
   justify-content: center;
