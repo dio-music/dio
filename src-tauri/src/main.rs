@@ -3,9 +3,10 @@
     windows_subsystem = "windows"
 )]
 
-use std::sync::Mutex;
+mod json_loading;
 
 use rfd::FileDialog;
+use std::sync::Mutex;
 
 struct Dio(Mutex<DioState>);
 
@@ -34,6 +35,9 @@ fn select_spotify_data_folder(unlocked_state: tauri::State<Dio>) -> Option<Strin
         None
     }
 }
+
+// #[tauri::command]
+// fn load_spotify_data(unlocked_state: tauri::State<Dio>) -> Option<String> {}
 
 fn main() {
     tauri::Builder::default()

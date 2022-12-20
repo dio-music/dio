@@ -1,8 +1,8 @@
 [package]
 name = "dio"
 version = "0.0.0"
-description = "A Tauri App"
-authors = ["you"]
+description = "Your personal music historian."
+authors = ["Jake Marchewitz"]
 license = ""
 repository = ""
 edition = "2021"
