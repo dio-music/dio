@@ -1,4 +1,4 @@
-use crate::json_loading;
+use crate::data_loading;
 
 use eyre::{eyre, Result};
 use serde::{Deserialize, Serialize};
@@ -76,9 +76,7 @@ fn get_song_history_file_paths(base_path: &path::PathBuf) -> Result<Vec<path::Pa
     }
 }
 
-pub fn extract_song_plays_from_json_files_at_path(
-    base_path: &path::PathBuf,
-) -> Result<Vec<PlayedItem>> {
+pub fn extract_plays_from_path(base_path: &path::PathBuf) -> Result<Vec<PlayedItem>> {
     // Get all of the song history file paths
     match get_song_history_file_paths(base_path) {
         Ok(file_paths) => {
@@ -87,7 +85,7 @@ pub fn extract_song_plays_from_json_files_at_path(
 
             // Extract a Vec of SongPlay instances from all of the JSON files
             for path in file_paths.iter() {
-                if let Ok(mut single_file_song_plays) = json_loading::get_song_plays_from_file(path)
+                if let Ok(mut single_file_song_plays) = data_loading::get_song_plays_from_file(path)
                 {
                     all_song_plays.append(&mut single_file_song_plays);
                 } else {

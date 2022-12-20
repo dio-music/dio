@@ -1,16 +1,15 @@
 const { invoke } = window.__TAURI__.tauri;
 
-let spotify_data_folder_path;
 
-async function select_spotify_data_folder() {
-  spotify_data_folder_path = await invoke("select_spotify_data_folder")
-
-  if (spotify_data_folder_path === null) {
-    document.getElementById("folder-selection-msg").innerHTML = "There was an error while trying to load the folder. Make sure you selected an unzipped copy of the zip file provided by Spotify. Please try again.";
-  } else {
-    // document.getElementById("folder-selection-msg").innerHTML = spotify_data_folder_path
-    window.location.assign("dashboard.html")
+async function load_spotify_data() {
+  try {
+    document.getElementById("folder-selection-general-status-msg").innerHTML = "Loading..."
+    await invoke("load_spotify_data");
+    window.location.assign("dashboard.html");
+  } catch (e) {
+    document.getElementById("folder-selection-general-status-msg").innerHTML = "There was an error while trying to load the folder. Make sure you selected an unzipped copy of the zip file provided by Spotify. Please try again.";
+    document.getElementById("folder-selection-extended-status-msg").innerHTML = e
   }
 }
 
-window.select_spotify_data_folder = select_spotify_data_folder
+window.load_spotify_data = load_spotify_data
