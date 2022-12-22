@@ -6,17 +6,19 @@
 mod data_loading;
 
 use rfd::FileDialog;
-use std::sync::Mutex;
+use std::{path::PathBuf, sync::Mutex};
 
 struct Dio(Mutex<DioState>);
 
 struct DioState {
+    spotify_data_folder_path: PathBuf,
     spotify_plays_data: Vec<data_loading::PlayedItem>,
 }
 
 impl Default for DioState {
     fn default() -> Self {
         DioState {
+            spotify_data_folder_path: PathBuf::default(),
             spotify_plays_data: Vec::new(),
         }
     }
@@ -35,6 +37,7 @@ fn load_spotify_data(unlocked_state: tauri::State<Dio>) -> Result<(), String> {
                 Err(_) => Err("Error while attempting to load Spotify data.".to_owned()),
                 // Extract the vec of PlayedItems from the Option that was returned
                 Ok(spotify_plays_data) => {
+                    state.spotify_data_folder_path = folder_path;
                     state.spotify_plays_data = spotify_plays_data;
                     Ok(())
                 }

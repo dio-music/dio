@@ -10,7 +10,23 @@
 </head>
 
 <body>
-  <h1>NEW_PAGE</h1>
+  <div id="left-panel">
+    <div id="filter-panel">
+      <h2 id="filter-panel-heading">Filter Selection</h2>
+      <label for="group-by">Show me</label>
+      <select name="group-by" id="group-by">
+        <option value="songs">Songs</option>
+        <option value="artists">Artists</option>
+        <option value="albums">Albums</option>
+        <option value="podcasts">Podcasts</option>
+        <option value="podcast-episodes">Podcast Episodes</option>
+        <option value="devices-listened-from">Devices I Listened From</option>
+      </select>
+    </div>
+  </div>
+  <div id="right-panel">
+    <div id="results-panel"></div>
+  </div>
 </body>
 
 </html>

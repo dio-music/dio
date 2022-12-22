@@ -38,10 +38,9 @@ fn get_song_plays_from_file(file_path: &path::PathBuf) -> Result<Vec<PlayedItem>
     let input_file = File::open(file_path)?;
     let mut buf_reader = BufReader::new(input_file);
     let mut contents = String::new();
-    buf_reader.read_to_string(&mut contents)?;
 
-    let song_play_data: Vec<PlayedItem> =
-        serde_json::from_str(&contents).expect("JSON was not well-formatted");
+    buf_reader.read_to_string(&mut contents)?;
+    let song_play_data: Vec<PlayedItem> = serde_json::from_str(&contents)?;
 
     Ok(song_play_data)
 }
@@ -79,6 +78,7 @@ fn get_song_history_file_paths(base_path: &path::PathBuf) -> Result<Vec<path::Pa
 pub fn extract_plays_from_path(base_path: &path::PathBuf) -> Result<Vec<PlayedItem>> {
     // Get all of the song history file paths
     match get_song_history_file_paths(base_path) {
+        Err(e) => Err(e),
         Ok(file_paths) => {
             // Vec to hold all of the song play instances from all JSON files combined
             let mut all_song_plays: Vec<PlayedItem> = vec![];
@@ -90,6 +90,7 @@ pub fn extract_plays_from_path(base_path: &path::PathBuf) -> Result<Vec<PlayedIt
                     all_song_plays.append(&mut single_file_song_plays);
                 } else {
                     // If the file can't be opened, then all of the data is loaded
+                    // TODO: Determine if this is the right behavior
                     break;
                 }
             }
@@ -97,6 +98,5 @@ pub fn extract_plays_from_path(base_path: &path::PathBuf) -> Result<Vec<PlayedIt
             // Return the song plays
             Ok(all_song_plays)
         }
-        Err(e) => Err(e),
     }
 }
