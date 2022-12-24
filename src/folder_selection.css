@@ -45,8 +45,12 @@
     background-color: #4a4453;
 }
 
-#status-messages {
-    margin-top: 5%;
+#status-msg-div {
+    margin-top: 2.5%;
+}
+
+.status-msg {
+    margin-top: 2.5%;
 }
 
 #credit-div {
@@ -54,12 +58,11 @@
     height: auto;
     text-align: center;
     display: grid;
-
 }
 
 #credit-msg {
     position: absolute;
     bottom: 0;
-    right: 1%;
+    right: 2.5%;
     font-size: 12px;
 }
