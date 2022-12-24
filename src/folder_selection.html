@@ -10,10 +10,19 @@
 </head>
 
 <body>
-  <h1>Click here to select the folder containing your Spotify data</h1>
-  <button type="button" onclick="load_spotify_data()">Click me!</button>
-  <p id="folder-selection-general-status-msg"></p>
-  <p id="folder-selection-extended-status-msg"></p>
+  <div id="outer-div">
+    <h1>Dio</h1>
+    <button type="button" id="folder-selection-button" onclick="load_spotify_data()">
+      Click here to select the folder containing your Spotify data
+    </button>
+    <div id="status-messages">
+      <p class="status-msg" id="folder-selection-general-status-msg"></p>
+      <p class="status-msg" id="folder-selection-extended-status-msg"></p>
+    </div>
+    <div id="credit-div">
+      <p id="credit-msg">Created by Jake Marchewitz</p>
+    </div>
+  </div>
 </body>
 
 </html>

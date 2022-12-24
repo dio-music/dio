@@ -1,0 +1,65 @@
+:root {
+    font-family: Inter, Avenir, Helvetica, Arial, sans-serif;
+    font-size: 16px;
+    line-height: 24px;
+    font-weight: 400;
+
+    color: #F6F6F6;
+    background-color: #1D201F;
+
+    font-synthesis: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-text-size-adjust: 100%;
+}
+
+#outer-div {
+    width: auto;
+    height: auto;
+    display: grid;
+    text-align: center;
+    margin-top: 12.5%;
+}
+
+#folder-selection-button {
+    color: #F6F6F6;
+    background-color: #6633FF;
+    border: none;
+    border-radius: 12px;
+    padding: 20px;
+    width: 50%;
+    font-size: medium;
+    margin-top: 7.5%;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: auto;
+}
+
+/* #folder-selection-button:hover {
+    background-color: #8d53ff;
+} */
+
+#folder-selection-button:active {
+    border: none;
+    background-color: #4a4453;
+}
+
+#status-messages {
+    margin-top: 5%;
+}
+
+#credit-div {
+    width: auto;
+    height: auto;
+    text-align: center;
+    display: grid;
+
+}
+
+#credit-msg {
+    position: absolute;
+    bottom: 0;
+    right: 1%;
+    font-size: 12px;
+}

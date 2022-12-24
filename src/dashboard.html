@@ -12,27 +12,33 @@
 <body>
   <div id="left-panel">
     <div id="filter-panel">
-      <h2 id="filter-panel-heading">Filter Selection</h2>
-      <label for="group-by">Show me</label>
+      <h2 id="filter-panel-heading">Filter</h2>
+      <label for="group-by">Show Me</label>
+      <br>
       <select name="group-by" id="group-by">
-        <option value="songs">songs</option>
-        <option value="artists">artists</option>
-        <option value="albums">albums</option>
-        <option value="podcasts">podcasts</option>
-        <option value="podcast-episodes">podcast episodes</option>
-        <option value="devices-listened-from">devices I listened from</option>
+        <option value="songs">Songs</option>
+        <option value="artists">Artists</option>
+        <option value="albums">Albums</option>
+        <option value="podcasts">Podcasts</option>
+        <option value="podcast-episodes">Podcast Episodes</option>
+        <option value="devices-listened-from">Devices I Listened From</option>
       </select>
       <br>
-      <label for="sort-by">Sorted by</label>
-      <select name="sort-by" id="sort-by">
-        <option value="plays">number of plays</option>
-        <option value="listen-time">total listen time</option>
-        <option value="skip-pct">skip percentage</option>
-        <option value="shuffle-pct">shuffle percentage</option>
-      </select>
+      <br>
+      <!-- Implement min and max date. Max date must be dynamic based on the end date. -->
+      <label for="start-date">Start Date:</label>
+      <br>
+      <input type="date" id="start-date" name="start-date">
+      <br>
+      <br>
+      <!-- Implement min and max date. Min date must be dynamic based on the start date. -->
+      <label for="end-date">End Date:</label>
+      <br>
+      <input type="date" id="end-date" name="end-date">
+      <br>
+      <br>
     </div>
     <br>
-    <button type="button">Apply Filter</button>
     <button type="button">Reset Filter</button>
   </div>
   <div id="right-panel">
