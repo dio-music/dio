@@ -2,6 +2,7 @@
 
 use crate::json_loading::PlayedItem;
 use crate::util;
+use serde::ser::Serialize;
 use std::collections::HashMap;
 use std::fmt::{self, Display};
 
@@ -16,22 +17,41 @@ pub trait SpotifyData {
     /// Creates a new instance from an instance of PlayedItem
     fn from_track_info(played_item: &PlayedItem) -> Self;
 
+    /// Extracts a field from played_item to be used as a dictionary key. This key changes based on the
+    /// struct that implements SpotifyData. For example, a SongData struct would return the song title,
+    /// while an ArtistData struct would return the artist's name.
+    /// TODO: Determine if the UID should be included when generating the key
+    fn get_key(played_item: &PlayedItem) -> String;
+
     /// Adds to the total number of ms of play time the instance has
     fn add_time_to_ms_played(&mut self, new_ms_played: &u64);
 
     /// Increment the instance's play count by one
     fn increment_play_count(&mut self);
 
-    /// Extracts a field from played_item to be used as a dictionary key. This key changes based on the
-    /// struct that implements SpotifyData. For example, a SongData struct would return the song title,
-    /// while an ArtistData struct would return the artist's name.
-    fn get_key_from_track_info(played_item: &PlayedItem) -> String;
+    /// Increment the instance's skip count by one
+    fn increment_skip_count(&mut self);
+
+    /// Increment the instance's click count by one
+    fn increment_click_count(&mut self);
+
+    /// Increment the instance's shuffle count by one
+    fn increment_shuffle_count(&mut self);
 
     /// Returns the total play time for the instance (in ms)
     fn get_ms_played(&self) -> u64;
 
     /// Returns the total number of plays for the instance
-    fn get_play_count(&self) -> u32;
+    fn get_play_count(&self) -> u64;
+
+    /// Returns the overall skip percentage
+    fn get_skip_pct(&self) -> f64;
+
+    /// Returns the overall click percentage
+    fn get_click_pct(&self) -> f64;
+
+    /// Returns the overall shuffle percentage
+    fn get_shuffle_pct(&self) -> f64;
 
     /// Returns true if the played item should be included in the overall aggregation. This is a bit
     /// confusing, but the general point is to only count plays of songs if the Struct is SongData,
@@ -45,13 +65,16 @@ pub trait SpotifyData {
 ///////////////
 
 /// Represents the aggregated data (across all PlayedItem instances in a collection) about a single song
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Serialize)]
 pub struct SongData {
     pub album_name: String,
     pub artist_name: String,
     pub track_name: String,
     pub ms_played: u64,
     pub play_count: u32,
+    pub skip_count: u32,
+    pub click_count: u32,
+    pub shuffle_count: u32,
 }
 
 impl SpotifyData for SongData {
@@ -68,6 +91,9 @@ impl SpotifyData for SongData {
                 track_name: track_name.to_owned(),
                 ms_played: 0,
                 play_count: 0,
+                skip_count: 0,
+                click_count: 0,
+                shuffle_count: 0,
             }
         } else {
             SongData {
@@ -76,7 +102,18 @@ impl SpotifyData for SongData {
                 track_name: "".to_owned(),
                 ms_played: 0,
                 play_count: 0,
+                skip_count: 0,
+                click_count: 0,
+                shuffle_count: 0,
             }
+        }
+    }
+
+    // Returns the track URi as the key
+    fn get_key(played_item: &PlayedItem) -> String {
+        match &played_item.spotify_track_uri {
+            Some(track_uri) => track_uri.to_owned(),
+            None => "".to_owned(),
         }
     }
 
@@ -88,12 +125,16 @@ impl SpotifyData for SongData {
         self.play_count += 1;
     }
 
-    // Returns the track URi as the key
-    fn get_key_from_track_info(played_item: &PlayedItem) -> String {
-        match &played_item.spotify_track_uri {
-            Some(track_uri) => track_uri.to_owned(),
-            None => "".to_owned(),
-        }
+    fn increment_skip_count(&mut self) {
+        self.skip_count += 1;
+    }
+
+    fn increment_click_count(&mut self) {
+        self.click_count += 1;
+    }
+
+    fn increment_shuffle_count(&mut self) {
+        self.shuffle_count += 1;
     }
 
     fn get_ms_played(&self) -> u64 {
@@ -102,6 +143,30 @@ impl SpotifyData for SongData {
 
     fn get_play_count(&self) -> u32 {
         self.play_count
+    }
+
+    fn get_skip_pct(&self) -> f64 {
+        if self.play_count == 0 {
+            0
+        } else {
+            self.skip_count / self.play_count
+        }
+    }
+
+    fn get_click_pct(&self) -> f64 {
+        if self.play_count == 0 {
+            0
+        } else {
+            self.click_count / self.play_count
+        }
+    }
+
+    fn get_shuffle_pct(&self) -> f64 {
+        if self.play_count == 0 {
+            0
+        } else {
+            self.shuffle_count / self.play_count
+        }
     }
 
     fn played_item_is_valid_for_aggregation(played_item: &PlayedItem) -> bool {
@@ -135,12 +200,15 @@ impl fmt::Display for SongData {
 // ALBUM DATA //
 ////////////////
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Serialize)]
 pub struct AlbumData {
     pub album_name: String,
     pub artist_name: String,
     pub ms_played: u64,
     pub play_count: u32,
+    pub skip_count: u32,
+    pub click_count: u32,
+    pub shuffle_count: u32,
 }
 
 impl SpotifyData for AlbumData {
@@ -155,6 +223,9 @@ impl SpotifyData for AlbumData {
                 artist_name: artist_name.to_owned(),
                 ms_played: 0,
                 play_count: 0,
+                skip_count: 0,
+                click_count: 0,
+                shuffle_count: 0,
             }
         } else {
             AlbumData {
@@ -162,20 +233,15 @@ impl SpotifyData for AlbumData {
                 artist_name: "".to_owned(),
                 ms_played: 0,
                 play_count: 0,
+                skip_count: 0,
+                click_count: 0,
+                shuffle_count: 0,
             }
         }
     }
 
-    fn add_time_to_ms_played(&mut self, new_ms_played: &u64) {
-        self.ms_played += new_ms_played;
-    }
-
-    fn increment_play_count(&mut self) {
-        self.play_count += 1;
-    }
-
     // Returns a formatted string with the album and artist as the key
-    fn get_key_from_track_info(played_item: &PlayedItem) -> String {
+    fn get_key(played_item: &PlayedItem) -> String {
         if let PlayedItem {
             master_metadata_album_album_name: Some(album_name),
             master_metadata_album_artist_name: Some(artist_name),
@@ -188,12 +254,56 @@ impl SpotifyData for AlbumData {
         }
     }
 
+    fn add_time_to_ms_played(&mut self, new_ms_played: &u64) {
+        self.ms_played += new_ms_played;
+    }
+
+    fn increment_play_count(&mut self) {
+        self.play_count += 1;
+    }
+
+    fn increment_skip_count(&mut self) {
+        self.skip_count += 1;
+    }
+
+    fn increment_click_count(&mut self) {
+        self.click_count += 1;
+    }
+
+    fn increment_shuffle_count(&mut self) {
+        self.shuffle_count += 1;
+    }
+
     fn get_ms_played(&self) -> u64 {
         self.ms_played
     }
 
     fn get_play_count(&self) -> u32 {
         self.play_count
+    }
+
+    fn get_skip_pct(&self) -> f64 {
+        if self.play_count == 0 {
+            0
+        } else {
+            self.skip_count / self.play_count
+        }
+    }
+
+    fn get_click_pct(&self) -> f64 {
+        if self.play_count == 0 {
+            0
+        } else {
+            self.click_count / self.play_count
+        }
+    }
+
+    fn get_shuffle_pct(&self) -> f64 {
+        if self.play_count == 0 {
+            0
+        } else {
+            self.shuffle_count / self.play_count
+        }
     }
 
     fn played_item_is_valid_for_aggregation(played_item: &PlayedItem) -> bool {
@@ -226,11 +336,14 @@ impl fmt::Display for AlbumData {
 // ARTIST DATA //
 /////////////////
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Serialize)]
 pub struct ArtistData {
     pub artist_name: String,
     pub ms_played: u64,
     pub play_count: u32,
+    pub skip_count: u32,
+    pub click_count: u32,
+    pub shuffle_count: u32,
 }
 
 impl SpotifyData for ArtistData {
@@ -243,13 +356,27 @@ impl SpotifyData for ArtistData {
                 artist_name: artist_name.to_owned(),
                 ms_played: 0,
                 play_count: 0,
+                skip_count: 0,
+                click_count: 0,
+                shuffle_count: 0,
             }
         } else {
             ArtistData {
                 artist_name: "".to_owned(),
                 ms_played: 0,
                 play_count: 0,
+                skip_count: 0,
+                click_count: 0,
+                shuffle_count: 0,
             }
+        }
+    }
+
+    // Returns the artist name as the key
+    fn get_key(played_item: &PlayedItem) -> String {
+        match &played_item.master_metadata_album_artist_name {
+            Some(artist_name) => artist_name.to_owned(),
+            None => "".to_owned(),
         }
     }
 
@@ -261,12 +388,16 @@ impl SpotifyData for ArtistData {
         self.play_count += 1;
     }
 
-    // Returns the artist name as the key
-    fn get_key_from_track_info(played_item: &PlayedItem) -> String {
-        match &played_item.master_metadata_album_artist_name {
-            Some(artist_name) => artist_name.to_owned(),
-            None => "".to_owned(),
-        }
+    fn increment_skip_count(&mut self) {
+        self.skip_count += 1;
+    }
+
+    fn increment_click_count(&mut self) {
+        self.click_count += 1;
+    }
+
+    fn increment_shuffle_count(&mut self) {
+        self.shuffle_count += 1;
     }
 
     fn get_ms_played(&self) -> u64 {
@@ -275,6 +406,30 @@ impl SpotifyData for ArtistData {
 
     fn get_play_count(&self) -> u32 {
         self.play_count
+    }
+
+    fn get_skip_pct(&self) -> f64 {
+        if self.play_count == 0 {
+            0
+        } else {
+            self.skip_count / self.play_count
+        }
+    }
+
+    fn get_click_pct(&self) -> f64 {
+        if self.play_count == 0 {
+            0
+        } else {
+            self.click_count / self.play_count
+        }
+    }
+
+    fn get_shuffle_pct(&self) -> f64 {
+        if self.play_count == 0 {
+            0
+        } else {
+            self.shuffle_count / self.play_count
+        }
     }
 
     fn played_item_is_valid_for_aggregation(played_item: &PlayedItem) -> bool {
@@ -306,12 +461,15 @@ impl fmt::Display for ArtistData {
 // PODCAST EPISODE DATA //
 //////////////////////////
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Serialize)]
 pub struct EpisodeData {
     pub episode_name: String,
     pub podcast_name: String,
     pub ms_played: u64,
     pub play_count: u32,
+    pub skip_count: u32,
+    pub click_count: u32,
+    pub shuffle_count: u32,
 }
 
 impl SpotifyData for EpisodeData {
@@ -327,6 +485,9 @@ impl SpotifyData for EpisodeData {
                 podcast_name: podcast_name.to_owned(),
                 ms_played: 0,
                 play_count: 0,
+                skip_count: 0,
+                click_count: 0,
+                shuffle_count: 0,
             }
         } else {
             EpisodeData {
@@ -334,7 +495,18 @@ impl SpotifyData for EpisodeData {
                 podcast_name: "".to_owned(),
                 ms_played: 0,
                 play_count: 0,
+                skip_count: 0,
+                click_count: 0,
+                shuffle_count: 0,
             }
+        }
+    }
+
+    // Returns the episode URi as the key
+    fn get_key(played_item: &PlayedItem) -> String {
+        match &played_item.spotify_episode_uri {
+            Some(episode_uri) => episode_uri.to_owned(),
+            None => "".to_owned(),
         }
     }
 
@@ -346,12 +518,16 @@ impl SpotifyData for EpisodeData {
         self.play_count += 1;
     }
 
-    // Returns the episode URi as the key
-    fn get_key_from_track_info(played_item: &PlayedItem) -> String {
-        match &played_item.spotify_episode_uri {
-            Some(episode_uri) => episode_uri.to_owned(),
-            None => "".to_owned(),
-        }
+    fn increment_skip_count(&mut self) {
+        self.skip_count += 1;
+    }
+
+    fn increment_click_count(&mut self) {
+        self.click_count += 1;
+    }
+
+    fn increment_shuffle_count(&mut self) {
+        self.shuffle_count += 1;
     }
 
     fn get_ms_played(&self) -> u64 {
@@ -360,6 +536,30 @@ impl SpotifyData for EpisodeData {
 
     fn get_play_count(&self) -> u32 {
         self.play_count
+    }
+
+    fn get_skip_pct(&self) -> f64 {
+        if self.play_count == 0 {
+            0
+        } else {
+            self.skip_count / self.play_count
+        }
+    }
+
+    fn get_click_pct(&self) -> f64 {
+        if self.play_count == 0 {
+            0
+        } else {
+            self.click_count / self.play_count
+        }
+    }
+
+    fn get_shuffle_pct(&self) -> f64 {
+        if self.play_count == 0 {
+            0
+        } else {
+            self.shuffle_count / self.play_count
+        }
     }
 
     fn played_item_is_valid_for_aggregation(played_item: &PlayedItem) -> bool {
@@ -391,11 +591,14 @@ impl Display for EpisodeData {
 // PODCAST DATA //
 //////////////////
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Serialize)]
 pub struct PodcastData {
     pub podcast_name: String,
     pub ms_played: u64,
     pub play_count: u32,
+    pub skip_count: u32,
+    pub click_count: u32,
+    pub shuffle_count: u32,
 }
 
 impl SpotifyData for PodcastData {
@@ -409,13 +612,27 @@ impl SpotifyData for PodcastData {
                 podcast_name: podcast_name.to_owned(),
                 ms_played: 0,
                 play_count: 0,
+                skip_count: 0,
+                click_count: 0,
+                shuffle_count: 0,
             }
         } else {
             PodcastData {
                 podcast_name: "".to_owned(),
                 ms_played: 0,
                 play_count: 0,
+                skip_count: 0,
+                click_count: 0,
+                shuffle_count: 0,
             }
+        }
+    }
+
+    // Returns the name of the podcast name as the key
+    fn get_key(played_item: &PlayedItem) -> String {
+        match &played_item.episode_show_name {
+            Some(podcast_name) => podcast_name.to_owned(),
+            None => "".to_owned(),
         }
     }
 
@@ -427,12 +644,16 @@ impl SpotifyData for PodcastData {
         self.play_count += 1;
     }
 
-    // Returns the name of the podcast name as the key
-    fn get_key_from_track_info(played_item: &PlayedItem) -> String {
-        match &played_item.episode_show_name {
-            Some(podcast_name) => podcast_name.to_owned(),
-            None => "".to_owned(),
-        }
+    fn increment_skip_count(&mut self) {
+        self.skip_count += 1;
+    }
+
+    fn increment_click_count(&mut self) {
+        self.click_count += 1;
+    }
+
+    fn increment_shuffle_count(&mut self) {
+        self.shuffle_count += 1;
     }
 
     fn get_ms_played(&self) -> u64 {
@@ -441,6 +662,30 @@ impl SpotifyData for PodcastData {
 
     fn get_play_count(&self) -> u32 {
         self.play_count
+    }
+
+    fn get_skip_pct(&self) -> f64 {
+        if self.play_count == 0 {
+            0
+        } else {
+            self.skip_count / self.play_count
+        }
+    }
+
+    fn get_click_pct(&self) -> f64 {
+        if self.play_count == 0 {
+            0
+        } else {
+            self.click_count / self.play_count
+        }
+    }
+
+    fn get_shuffle_pct(&self) -> f64 {
+        if self.play_count == 0 {
+            0
+        } else {
+            self.shuffle_count / self.play_count
+        }
     }
 
     fn played_item_is_valid_for_aggregation(played_item: &PlayedItem) -> bool {
@@ -475,6 +720,9 @@ impl Display for PodcastData {
 pub enum SortSpotifyDataBy {
     TotalListenTime,
     PlayCount,
+    SkipPct,
+    ClickPct,
+    ShufflePct,
 }
 
 /// Returns aggregated data about the PlayedItems in all_played_items. For instance, this function can return
@@ -492,29 +740,40 @@ pub fn get_aggregated_data<T: Clone + SpotifyData>(
         // If the pla
         if T::played_item_is_valid_for_aggregation(played_item) {
             if let Some(ms_played) = played_item.ms_played {
-                let song_data = aggregated_data
-                    .entry(T::get_key_from_track_info(played_item))
+                let entry = aggregated_data
+                    .entry(T::get_key(played_item))
                     .or_insert_with(|| T::from_track_info(played_item));
 
-                song_data.add_time_to_ms_played(&ms_played);
-                song_data.increment_play_count();
+                entry.add_time_to_ms_played(&ms_played);
+                entry.increment_play_count();
+
+                // TODO: implement checks to increment the other fields of the entry struct
             }
         }
     }
 
     let mut sorted_aggregated_data: Vec<T> = aggregated_data
         .into_iter()
-        .map(|(_uri, song_entry)| song_entry)
+        .map(|(_uri, entry)| entry)
         .collect::<Vec<T>>();
 
     // The sort must happen in-place so the sort call must happen outside of a let statement since the sort
     // does not return a Vec<SongEntry>
     match sory_by {
         SortSpotifyDataBy::TotalListenTime => {
-            sorted_aggregated_data.sort_by_key(|song_entry| song_entry.get_ms_played())
+            sorted_aggregated_data.sort_by_key(|entry| entry.get_ms_played());
         }
         SortSpotifyDataBy::PlayCount => {
-            sorted_aggregated_data.sort_by_key(|song_entry| song_entry.get_play_count())
+            sorted_aggregated_data.sort_by_key(|entry| entry.get_play_count());
+        }
+        SortSpotifyDataBy::SkipPct => {
+            sorted_aggregated_data.sort_by_key(|entry| entry.get_skip_pct());
+        }
+        SortSpotifyDataBy::ClickPct => {
+            sorted_aggregated_data.sort_by_key(|entry| entry.get_click_pct());
+        }
+        SortSpotifyDataBy::ShufflePct => {
+            sorted_aggregated_data.sort_by_key(|entry| entry.get_shuffle_pct());
         }
     }
 
@@ -525,5 +784,3 @@ pub fn get_aggregated_data<T: Clone + SpotifyData>(
 
     sorted_aggregated_data
 }
-
-// pub fn print_aggregated_data();

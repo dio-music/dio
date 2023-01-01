@@ -7,7 +7,7 @@
     "withGlobalTauri": true
   },
   "package": {
-    "productName": "Dio",
+    "productName": "dio",
     "version": "0.0.0"
   },
   "tauri": {

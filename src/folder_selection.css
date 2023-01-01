@@ -5,9 +5,11 @@
     font-weight: 400;
 
     --white: #F6F6F6;
-    --black: #1D201F;
+    /* --purple: #1D201F; */
+    --black: #121413;
     --purple: #6633FF;
-    --pressed-purple: #4A4453;
+    --pressed-button-text: #D6D6D6;
+    --pressed-button-background: #4321A8;
 
     color: var(--white);
     background-color: var(--black);
@@ -24,7 +26,7 @@
     height: auto;
     display: grid;
     text-align: center;
-    margin-top: 7.5%;
+    margin-top: 20%;
 }
 
 #folder-selection-button {
@@ -33,9 +35,10 @@
     border: none;
     border-radius: 12px;
     padding: 20px;
-    width: 50%;
-    font-size: medium;
-    margin-top: 7.5%;
+    padding-left: 30px;
+    padding-right: 30px;
+    width: auto;
+    font-size: large;
     margin-left: auto;
     margin-right: auto;
     margin-bottom: auto;
@@ -47,7 +50,8 @@
 
 #folder-selection-button:active {
     border: none;
-    background-color: var(--pressed-purple);
+    color: var(--pressed-button-text);
+    background-color: var(--pressed-button-background);
 }
 
 #status-msg-div {
