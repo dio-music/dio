@@ -1,8 +1,6 @@
-#![allow(dead_code)]
-
-use crate::json_loading::PlayedItem;
+use crate::plays::PlayedItem;
 use crate::util;
-use serde::ser::Serialize;
+use serde::Serialize;
 use std::collections::HashMap;
 use std::fmt::{self, Display};
 
@@ -42,7 +40,7 @@ pub trait SpotifyData {
     fn get_ms_played(&self) -> u64;
 
     /// Returns the total number of plays for the instance
-    fn get_play_count(&self) -> u64;
+    fn get_play_count(&self) -> u32;
 
     /// Returns the overall skip percentage
     fn get_skip_pct(&self) -> f64;
@@ -147,25 +145,25 @@ impl SpotifyData for SongData {
 
     fn get_skip_pct(&self) -> f64 {
         if self.play_count == 0 {
-            0
+            0.
         } else {
-            self.skip_count / self.play_count
+            self.skip_count as f64 / self.play_count as f64
         }
     }
 
     fn get_click_pct(&self) -> f64 {
         if self.play_count == 0 {
-            0
+            0.
         } else {
-            self.click_count / self.play_count
+            self.click_count as f64 / self.play_count as f64
         }
     }
 
     fn get_shuffle_pct(&self) -> f64 {
         if self.play_count == 0 {
-            0
+            0.
         } else {
-            self.shuffle_count / self.play_count
+            self.shuffle_count as f64 / self.play_count as f64
         }
     }
 
@@ -284,25 +282,25 @@ impl SpotifyData for AlbumData {
 
     fn get_skip_pct(&self) -> f64 {
         if self.play_count == 0 {
-            0
+            0.
         } else {
-            self.skip_count / self.play_count
+            self.skip_count as f64 / self.play_count as f64
         }
     }
 
     fn get_click_pct(&self) -> f64 {
         if self.play_count == 0 {
-            0
+            0.
         } else {
-            self.click_count / self.play_count
+            self.click_count as f64 / self.play_count as f64
         }
     }
 
     fn get_shuffle_pct(&self) -> f64 {
         if self.play_count == 0 {
-            0
+            0.
         } else {
-            self.shuffle_count / self.play_count
+            self.shuffle_count as f64 / self.play_count as f64
         }
     }
 
@@ -410,25 +408,25 @@ impl SpotifyData for ArtistData {
 
     fn get_skip_pct(&self) -> f64 {
         if self.play_count == 0 {
-            0
+            0.
         } else {
-            self.skip_count / self.play_count
+            self.skip_count as f64 / self.play_count as f64
         }
     }
 
     fn get_click_pct(&self) -> f64 {
         if self.play_count == 0 {
-            0
+            0.
         } else {
-            self.click_count / self.play_count
+            self.click_count as f64 / self.play_count as f64
         }
     }
 
     fn get_shuffle_pct(&self) -> f64 {
         if self.play_count == 0 {
-            0
+            0.
         } else {
-            self.shuffle_count / self.play_count
+            self.shuffle_count as f64 / self.play_count as f64
         }
     }
 
@@ -540,25 +538,25 @@ impl SpotifyData for EpisodeData {
 
     fn get_skip_pct(&self) -> f64 {
         if self.play_count == 0 {
-            0
+            0.
         } else {
-            self.skip_count / self.play_count
+            self.skip_count as f64 / self.play_count as f64
         }
     }
 
     fn get_click_pct(&self) -> f64 {
         if self.play_count == 0 {
-            0
+            0.
         } else {
-            self.click_count / self.play_count
+            self.click_count as f64 / self.play_count as f64
         }
     }
 
     fn get_shuffle_pct(&self) -> f64 {
         if self.play_count == 0 {
-            0
+            0.
         } else {
-            self.shuffle_count / self.play_count
+            self.shuffle_count as f64 / self.play_count as f64
         }
     }
 
@@ -666,25 +664,25 @@ impl SpotifyData for PodcastData {
 
     fn get_skip_pct(&self) -> f64 {
         if self.play_count == 0 {
-            0
+            0.
         } else {
-            self.skip_count / self.play_count
+            self.skip_count as f64 / self.play_count as f64
         }
     }
 
     fn get_click_pct(&self) -> f64 {
         if self.play_count == 0 {
-            0
+            0.
         } else {
-            self.click_count / self.play_count
+            self.click_count as f64 / self.play_count as f64
         }
     }
 
     fn get_shuffle_pct(&self) -> f64 {
         if self.play_count == 0 {
-            0
+            0.
         } else {
-            self.shuffle_count / self.play_count
+            self.shuffle_count as f64 / self.play_count as f64
         }
     }
 
@@ -720,9 +718,9 @@ impl Display for PodcastData {
 pub enum SortSpotifyDataBy {
     TotalListenTime,
     PlayCount,
-    SkipPct,
     ClickPct,
     ShufflePct,
+    SkipPct,
 }
 
 /// Returns aggregated data about the PlayedItems in all_played_items. For instance, this function can return
@@ -761,19 +759,20 @@ pub fn get_aggregated_data<T: Clone + SpotifyData>(
     // does not return a Vec<SongEntry>
     match sory_by {
         SortSpotifyDataBy::TotalListenTime => {
-            sorted_aggregated_data.sort_by_key(|entry| entry.get_ms_played());
+            sorted_aggregated_data.sort_by(|a, b| a.get_ms_played().cmp(&b.get_ms_played()));
         }
         SortSpotifyDataBy::PlayCount => {
-            sorted_aggregated_data.sort_by_key(|entry| entry.get_play_count());
-        }
-        SortSpotifyDataBy::SkipPct => {
-            sorted_aggregated_data.sort_by_key(|entry| entry.get_skip_pct());
+            sorted_aggregated_data.sort_by(|a, b| a.get_play_count().cmp(&b.get_play_count()));
         }
         SortSpotifyDataBy::ClickPct => {
-            sorted_aggregated_data.sort_by_key(|entry| entry.get_click_pct());
+            sorted_aggregated_data.sort_by(|a, b| a.get_click_pct().total_cmp(&b.get_click_pct()));
         }
         SortSpotifyDataBy::ShufflePct => {
-            sorted_aggregated_data.sort_by_key(|entry| entry.get_shuffle_pct());
+            sorted_aggregated_data
+                .sort_by(|a, b| a.get_shuffle_pct().total_cmp(&b.get_shuffle_pct()));
+        }
+        SortSpotifyDataBy::SkipPct => {
+            sorted_aggregated_data.sort_by(|a, b| a.get_skip_pct().total_cmp(&b.get_skip_pct()));
         }
     }
 

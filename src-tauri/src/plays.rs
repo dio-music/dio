@@ -1,5 +1,3 @@
-use crate::data_loading;
-
 use eyre::{eyre, Result};
 use serde::{Deserialize, Serialize};
 use std::fs::File;
@@ -84,9 +82,9 @@ pub fn extract_plays_from_path(base_path: &path::PathBuf) -> Result<Vec<PlayedIt
             let mut all_song_plays: Vec<PlayedItem> = vec![];
 
             // Extract a Vec of SongPlay instances from all of the JSON files
+            // TODO: Load data on separate thread?
             for path in file_paths.iter() {
-                if let Ok(mut single_file_song_plays) = data_loading::get_song_plays_from_file(path)
-                {
+                if let Ok(mut single_file_song_plays) = get_song_plays_from_file(path) {
                     all_song_plays.append(&mut single_file_song_plays);
                 } else {
                     // If the file can't be opened, then all of the data is loaded

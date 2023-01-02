@@ -173,7 +173,6 @@ impl ESWApp {
 
                 // If a data path has been selected, attempt to load it
                 if let Some(path) = &self.raw_data_path {
-                    // TODO: Load data on separate thread?
                     match json_loading::extract_song_plays_from_json_files_at_path(&path) {
                         Ok(data) => {
                             self.loaded_data = Some(data);
@@ -203,7 +202,6 @@ impl ESWApp {
     }
 
     /// Display the data screen to let the user analyze their data
-    /// TODO: Add button to choose new data folder
     fn data_screen(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
         egui::SidePanel::left("side_panel").show(ctx, |ui| {
             ui.add_space(6.);
