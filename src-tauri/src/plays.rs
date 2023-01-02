@@ -8,7 +8,7 @@ use std::path;
 /// A struct that represents one entry of an end_song.json file. This struct represents a single "play" of
 /// a single song/podcast.
 #[derive(Clone, Debug, Deserialize, Serialize)]
-pub struct PlayedItem {
+pub struct PlayItem {
     pub conn_country: Option<String>,
     pub episode_name: Option<String>,
     pub episode_show_name: Option<String>,
@@ -32,13 +32,13 @@ pub struct PlayedItem {
     pub username: Option<String>,
 }
 
-fn get_song_plays_from_file(file_path: &path::PathBuf) -> Result<Vec<PlayedItem>> {
+fn get_song_plays_from_file(file_path: &path::PathBuf) -> Result<Vec<PlayItem>> {
     let input_file = File::open(file_path)?;
     let mut buf_reader = BufReader::new(input_file);
     let mut contents = String::new();
 
     buf_reader.read_to_string(&mut contents)?;
-    let song_play_data: Vec<PlayedItem> = serde_json::from_str(&contents)?;
+    let song_play_data: Vec<PlayItem> = serde_json::from_str(&contents)?;
 
     Ok(song_play_data)
 }
@@ -73,13 +73,13 @@ fn get_song_history_file_paths(base_path: &path::PathBuf) -> Result<Vec<path::Pa
     }
 }
 
-pub fn extract_plays_from_path(base_path: &path::PathBuf) -> Result<Vec<PlayedItem>> {
+pub fn extract_plays_from_path(base_path: &path::PathBuf) -> Result<Vec<PlayItem>> {
     // Get all of the song history file paths
     match get_song_history_file_paths(base_path) {
         Err(e) => Err(e),
         Ok(file_paths) => {
             // Vec to hold all of the song play instances from all JSON files combined
-            let mut all_song_plays: Vec<PlayedItem> = vec![];
+            let mut all_song_plays: Vec<PlayItem> = vec![];
 
             // Extract a Vec of SongPlay instances from all of the JSON files
             // TODO: Load data on separate thread?

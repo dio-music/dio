@@ -3,6 +3,7 @@
     windows_subsystem = "windows"
 )]
 
+mod dates;
 mod groups;
 mod plays;
 mod util;
@@ -14,7 +15,7 @@ struct Dio(Mutex<DioState>);
 
 struct DioState {
     spotify_data_folder_path: Option<PathBuf>,
-    spotify_plays_data: Vec<plays::PlayedItem>,
+    spotify_plays_data: Vec<plays::PlayItem>,
 }
 
 impl Default for DioState {

@@ -13,37 +13,43 @@
   <div id="left-panel">
     <div id="filter-panel">
       <h2 id="filter-panel-heading">Filter</h2>
-      <label for="group-by">Show Me</label>
-      <br>
-      <select name="group-by" id="group-by">
-        <option value="songs">Songs</option>
-        <option value="artists">Artists</option>
-        <option value="albums">Albums</option>
-        <option value="podcasts">Podcasts</option>
-        <option value="podcast-episodes">Podcast Episodes</option>
-        <option value="devices-listened-from">Devices I Listened From</option>
-      </select>
-      <br>
-      <br>
-      <!-- Implement min and max date. Max date must be dynamic based on the end date. -->
-      <label for="start-date">Start Date:</label>
-      <br>
-      <input type="date" id="start-date" name="start-date">
-      <br>
-      <br>
-      <!-- Implement min and max date. Min date must be dynamic based on the start date. -->
-      <label for="end-date">End Date:</label>
-      <br>
-      <input type="date" id="end-date" name="end-date">
-      <br>
-      <br>
+
+      <div id="show-me-dropdown">
+        <label for="group-by">Show Me</label>
+        <select name="group-by" id="group-by">
+          <option value="songs">Songs</option>
+          <option value="artists">Artists</option>
+          <option value="albums">Albums</option>
+          <option value="podcasts">Podcasts</option>
+          <option value="podcast-episodes">Podcast Episodes</option>
+          <!-- <option value="devices-listened-from">Devices I Listened From</option> -->
+        </select>
+      </div>
+
+      <div class="date-selector-group" id="start-date-div">
+        <!-- TODO: Implement min and max date. Max date must be dynamic based on the end date. -->
+        <label for="start-date">Start Date</label>
+        <input type="date" id="start-date" class="date-input" name="start-date">
+      </div>
+
+      <div class="date-selector-group" id="end-date-div">
+        <!-- TODO: Implement min and max date. Min date must be dynamic based on the start date. -->
+        <label for="end-date">End Date</label>
+        <input type="date" id="end-date" class="date-input" name="end-date">
+      </div>
+
+      <button type="button" id="reset-filter-button">Reset Filter</button>
     </div>
-    <br>
-    <button type="button">Reset Filter</button>
+
+    <button type="button" id="load-new-spotify-data">Load New Spotify Data</button>
   </div>
+
   <div id="right-panel">
+
     <div id="results-panel"></div>
+
   </div>
+
 </body>
 
 </html>

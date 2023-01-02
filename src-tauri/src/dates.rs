@@ -1,11 +1,9 @@
-#![allow(dead_code)]
-
-use crate::json_loading::PlayedItem;
+use crate::plays::PlayItem;
 use chrono::prelude::*;
 use eyre::{eyre, Result};
 
 pub fn get_min_and_max_dates_from_played_items(
-    all_played_items: &[PlayedItem],
+    all_played_items: &[PlayItem],
 ) -> (Result<DateTime<Utc>>, Result<DateTime<Utc>>) {
     let mut min_date_res: Result<DateTime<Utc>> =
         Err(eyre!("Failed to find a minimum date in PlayedItems"));
@@ -48,11 +46,11 @@ pub fn get_min_and_max_dates_from_played_items(
 }
 
 pub fn get_played_items_between_dates(
-    all_played_items: &[PlayedItem],
+    all_played_items: &[PlayItem],
     start_date: DateTime<Utc>,
     end_date: DateTime<Utc>,
-) -> Vec<PlayedItem> {
-    let mut all_played_items_in_range: Vec<PlayedItem> = vec![];
+) -> Vec<PlayItem> {
+    let mut all_played_items_in_range: Vec<PlayItem> = vec![];
 
     for single_played_item in all_played_items.iter() {
         if let Some(ts) = single_played_item.ts.as_ref() {

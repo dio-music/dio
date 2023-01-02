@@ -1,15 +1,16 @@
 :root {
-    /* font-family: Inter, Avenir, Helvetica, Arial, sans-serif; */
-    font-family: Inter;
+    font-family: Inter, Avenir, Helvetica, Arial, sans-serif;
+    /* font-family: Inter; */
     font-size: 16px;
     line-height: 24px;
     font-weight: 400;
 
     --white: #F6F6F6;
-    /* --black: #1D201F; */
+    --dark-grey: #1D201F;
     --black: #121413;
     --purple: #6633FF;
-    --pressed-purple: #4A4453;
+    --pressed-button-text: #D6D6D6;
+    --pressed-button-background: #4321A8;
 
     color: var(--white);
     background-color: var(--black);
@@ -19,4 +20,67 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     -webkit-text-size-adjust: 100%;
+}
+
+body {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    margin: 0;
+    height: 100vh;
+}
+
+#left-panel {
+    order: 0;
+    margin: 1%;
+    border: var(--purple);
+    border-width: 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+#filter-panel {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+}
+
+#filter-panel-heading {
+    margin-top: 2.5%;
+    align-self: center;
+}
+
+#show-me-dropdown {
+    display: flex;
+    flex-direction: column;
+    margin-top: 0%;
+    margin-bottom: 7.5%;
+}
+
+.date-selector-group {
+    display: flex;
+    flex-direction: column;
+    margin-block: 7.5%;
+}
+
+.date-input {
+    width: auto;
+    align-self: center;
+}
+
+#reset-filter-button {
+    /* margin-top: 5%; */
+    margin-block: 15%;
+}
+
+#load-new-spotify-data {
+    margin-top: auto;
+}
+
+#right-panel {
+    order: 1;
+    flex-grow: 1;
+    background-color: var(--dark-grey);
+    margin: 0;
 }

@@ -1,25 +1,21 @@
-use crate::plays::PlayedItem;
+use crate::plays::PlayItem;
 use crate::util;
 use serde::Serialize;
 use std::collections::HashMap;
 use std::fmt::{self, Display};
-
-//////////////////////
-// DATA AGGREGATION //
-//////////////////////
 
 /// SpotifyData is a trait meant to standardize the functions needed for a struct to represent aggregated data
 /// for a single piece of music data (Artist, Album, Song). An instance of a struct that implements
 /// SpotifyData will represent the aggregated of one artist, album, or song.
 pub trait SpotifyData {
     /// Creates a new instance from an instance of PlayedItem
-    fn from_track_info(played_item: &PlayedItem) -> Self;
+    fn from_track_info(played_item: &PlayItem) -> Self;
 
     /// Extracts a field from played_item to be used as a dictionary key. This key changes based on the
     /// struct that implements SpotifyData. For example, a SongData struct would return the song title,
     /// while an ArtistData struct would return the artist's name.
     /// TODO: Determine if the UID should be included when generating the key
-    fn get_key(played_item: &PlayedItem) -> String;
+    fn get_key(played_item: &PlayItem) -> String;
 
     /// Adds to the total number of ms of play time the instance has
     fn add_time_to_ms_played(&mut self, new_ms_played: &u64);
@@ -55,7 +51,7 @@ pub trait SpotifyData {
     /// confusing, but the general point is to only count plays of songs if the Struct is SongData,
     /// ArtistData, or AlbumData. Similarly, only plays of podcasts are valid for aggregation if
     /// the Struct is EpisodeData or PodcastData.
-    fn played_item_is_valid_for_aggregation(played_item: &PlayedItem) -> bool;
+    fn played_item_is_valid_for_aggregation(played_item: &PlayItem) -> bool;
 }
 
 ///////////////
@@ -76,8 +72,8 @@ pub struct SongData {
 }
 
 impl SpotifyData for SongData {
-    fn from_track_info(played_item: &PlayedItem) -> Self {
-        if let PlayedItem {
+    fn from_track_info(played_item: &PlayItem) -> Self {
+        if let PlayItem {
             master_metadata_album_album_name: Some(album_name),
             master_metadata_album_artist_name: Some(artist_name),
             master_metadata_track_name: Some(track_name),
@@ -108,7 +104,7 @@ impl SpotifyData for SongData {
     }
 
     // Returns the track URi as the key
-    fn get_key(played_item: &PlayedItem) -> String {
+    fn get_key(played_item: &PlayItem) -> String {
         match &played_item.spotify_track_uri {
             Some(track_uri) => track_uri.to_owned(),
             None => "".to_owned(),
@@ -167,10 +163,10 @@ impl SpotifyData for SongData {
         }
     }
 
-    fn played_item_is_valid_for_aggregation(played_item: &PlayedItem) -> bool {
+    fn played_item_is_valid_for_aggregation(played_item: &PlayItem) -> bool {
         matches!(
             played_item,
-            PlayedItem {
+            PlayItem {
                 master_metadata_album_album_name: Some(_),
                 master_metadata_album_artist_name: Some(_),
                 master_metadata_track_name: Some(_),
@@ -210,8 +206,8 @@ pub struct AlbumData {
 }
 
 impl SpotifyData for AlbumData {
-    fn from_track_info(played_item: &PlayedItem) -> Self {
-        if let PlayedItem {
+    fn from_track_info(played_item: &PlayItem) -> Self {
+        if let PlayItem {
             master_metadata_album_album_name: Some(album_name),
             master_metadata_album_artist_name: Some(artist_name),
             .. // Ignore all other fields of played_item
@@ -239,8 +235,8 @@ impl SpotifyData for AlbumData {
     }
 
     // Returns a formatted string with the album and artist as the key
-    fn get_key(played_item: &PlayedItem) -> String {
-        if let PlayedItem {
+    fn get_key(played_item: &PlayItem) -> String {
+        if let PlayItem {
             master_metadata_album_album_name: Some(album_name),
             master_metadata_album_artist_name: Some(artist_name),
             ..
@@ -304,10 +300,10 @@ impl SpotifyData for AlbumData {
         }
     }
 
-    fn played_item_is_valid_for_aggregation(played_item: &PlayedItem) -> bool {
+    fn played_item_is_valid_for_aggregation(played_item: &PlayItem) -> bool {
         matches!(
             played_item,
-            PlayedItem {
+            PlayItem {
                 master_metadata_album_album_name: Some(_),
                 master_metadata_album_artist_name: Some(_),
                 master_metadata_track_name: Some(_),
@@ -345,8 +341,8 @@ pub struct ArtistData {
 }
 
 impl SpotifyData for ArtistData {
-    fn from_track_info(played_item: &PlayedItem) -> Self {
-        if let PlayedItem {
+    fn from_track_info(played_item: &PlayItem) -> Self {
+        if let PlayItem {
             master_metadata_album_artist_name: Some(artist_name),
             .. // Ignore all other fields of played_item
         } = played_item {
@@ -371,7 +367,7 @@ impl SpotifyData for ArtistData {
     }
 
     // Returns the artist name as the key
-    fn get_key(played_item: &PlayedItem) -> String {
+    fn get_key(played_item: &PlayItem) -> String {
         match &played_item.master_metadata_album_artist_name {
             Some(artist_name) => artist_name.to_owned(),
             None => "".to_owned(),
@@ -430,10 +426,10 @@ impl SpotifyData for ArtistData {
         }
     }
 
-    fn played_item_is_valid_for_aggregation(played_item: &PlayedItem) -> bool {
+    fn played_item_is_valid_for_aggregation(played_item: &PlayItem) -> bool {
         matches!(
             played_item,
-            PlayedItem {
+            PlayItem {
                 master_metadata_album_album_name: Some(_),
                 master_metadata_album_artist_name: Some(_),
                 master_metadata_track_name: Some(_),
@@ -471,8 +467,8 @@ pub struct EpisodeData {
 }
 
 impl SpotifyData for EpisodeData {
-    fn from_track_info(played_item: &PlayedItem) -> Self {
-        if let PlayedItem {
+    fn from_track_info(played_item: &PlayItem) -> Self {
+        if let PlayItem {
             episode_show_name: Some(podcast_name),
             episode_name: Some(episode_name),
             ..
@@ -501,7 +497,7 @@ impl SpotifyData for EpisodeData {
     }
 
     // Returns the episode URi as the key
-    fn get_key(played_item: &PlayedItem) -> String {
+    fn get_key(played_item: &PlayItem) -> String {
         match &played_item.spotify_episode_uri {
             Some(episode_uri) => episode_uri.to_owned(),
             None => "".to_owned(),
@@ -560,10 +556,10 @@ impl SpotifyData for EpisodeData {
         }
     }
 
-    fn played_item_is_valid_for_aggregation(played_item: &PlayedItem) -> bool {
+    fn played_item_is_valid_for_aggregation(played_item: &PlayItem) -> bool {
         matches!(
             played_item,
-            PlayedItem {
+            PlayItem {
                 episode_show_name: Some(_),
                 episode_name: Some(_),
                 .. // Ignore all other fields of played_item
@@ -600,8 +596,8 @@ pub struct PodcastData {
 }
 
 impl SpotifyData for PodcastData {
-    fn from_track_info(played_item: &PlayedItem) -> Self {
-        if let PlayedItem {
+    fn from_track_info(played_item: &PlayItem) -> Self {
+        if let PlayItem {
             episode_show_name: Some(podcast_name),
             ..
         } = played_item
@@ -627,7 +623,7 @@ impl SpotifyData for PodcastData {
     }
 
     // Returns the name of the podcast name as the key
-    fn get_key(played_item: &PlayedItem) -> String {
+    fn get_key(played_item: &PlayItem) -> String {
         match &played_item.episode_show_name {
             Some(podcast_name) => podcast_name.to_owned(),
             None => "".to_owned(),
@@ -686,10 +682,10 @@ impl SpotifyData for PodcastData {
         }
     }
 
-    fn played_item_is_valid_for_aggregation(played_item: &PlayedItem) -> bool {
+    fn played_item_is_valid_for_aggregation(played_item: &PlayItem) -> bool {
         matches!(
             played_item,
-            PlayedItem {
+            PlayItem {
                 episode_show_name: Some(_),
                 episode_name: Some(_),
                 .. // Ignore all other fields of played_item
@@ -726,7 +722,7 @@ pub enum SortSpotifyDataBy {
 /// Returns aggregated data about the PlayedItems in all_played_items. For instance, this function can return
 /// the top artists by play count, and it can also get the bottom songs by total listen time.
 pub fn get_aggregated_data<T: Clone + SpotifyData>(
-    all_played_items: &[PlayedItem],
+    all_played_items: &[PlayItem],
     sory_by: SortSpotifyDataBy,
     sort_descending: bool,
 ) -> Vec<T> {
