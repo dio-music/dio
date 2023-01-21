@@ -1,9 +1,7 @@
 use eyre::{eyre, Result};
 use serde::{Deserialize, Serialize};
-use std::fs::File;
-use std::io::prelude::*;
-use std::io::BufReader;
 use std::path;
+use tokio::fs;
 
 /// A struct that represents one entry of an end_song.json file. This struct represents a single "play" of
 /// a single song/podcast.
@@ -32,12 +30,8 @@ pub struct PlayItem {
     pub username: Option<String>,
 }
 
-fn get_song_plays_from_file(file_path: &path::PathBuf) -> Result<Vec<PlayItem>> {
-    let input_file = File::open(file_path)?;
-    let mut buf_reader = BufReader::new(input_file);
-    let mut contents = String::new();
-
-    buf_reader.read_to_string(&mut contents)?;
+async fn get_song_plays_from_file(file_path: &path::PathBuf) -> Result<Vec<PlayItem>> {
+    let contents = fs::read_to_string(file_path).await?;
     let song_play_data: Vec<PlayItem> = serde_json::from_str(&contents)?;
 
     Ok(song_play_data)
@@ -73,7 +67,7 @@ fn get_song_history_file_paths(base_path: &path::PathBuf) -> Result<Vec<path::Pa
     }
 }
 
-pub fn extract_plays_from_path(base_path: &path::PathBuf) -> Result<Vec<PlayItem>> {
+pub async fn extract_plays_from_path(base_path: &path::PathBuf) -> Result<Vec<PlayItem>> {
     // Get all of the song history file paths
     match get_song_history_file_paths(base_path) {
         Err(e) => Err(e),
@@ -82,9 +76,8 @@ pub fn extract_plays_from_path(base_path: &path::PathBuf) -> Result<Vec<PlayItem
             let mut all_song_plays: Vec<PlayItem> = vec![];
 
             // Extract a Vec of SongPlay instances from all of the JSON files
-            // TODO: Load data on separate thread?
             for path in file_paths.iter() {
-                if let Ok(mut single_file_song_plays) = get_song_plays_from_file(path) {
+                if let Ok(mut single_file_song_plays) = get_song_plays_from_file(path).await {
                     all_song_plays.append(&mut single_file_song_plays);
                 } else {
                     // If the file can't be opened, then all of the data is loaded

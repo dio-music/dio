@@ -1,66 +1,46 @@
 use crate::plays::PlayItem;
 use chrono::prelude::*;
-use eyre::{eyre, Result};
 
-pub fn get_min_and_max_dates_from_played_items(
-    all_played_items: &[PlayItem],
-) -> (Result<DateTime<Utc>>, Result<DateTime<Utc>>) {
-    let mut min_date_res: Result<DateTime<Utc>> =
-        Err(eyre!("Failed to find a minimum date in PlayedItems"));
-    let mut max_date_res: Result<DateTime<Utc>> =
-        Err(eyre!("Failed to find a maximum date in PlayedItems"));
+fn get_datetime_from_play_item(play_item: &PlayItem) -> Option<DateTime<Utc>> {
+    let mut dt_result: Option<DateTime<Utc>> = None;
 
-    // Initialize min_date_res and max_date_res to the first valid timestamp in all_played_items
-    for single_played_item in all_played_items.iter() {
-        if let Some(ts) = single_played_item.ts.as_ref() {
-            if let Ok(timestamp_dt) = ts.parse::<DateTime<Utc>>() {
-                min_date_res = Ok(timestamp_dt);
-                max_date_res = Ok(timestamp_dt);
-                break;
-            }
+    if let Some(ts) = &play_item.ts {
+        if let Ok(timestamp_dt) = ts.parse::<DateTime<Utc>>() {
+            dt_result = Some(timestamp_dt);
         }
     }
 
-    // Search all_played_items for the min and max timestamp
-    for single_played_item in all_played_items.iter() {
-        // If the timestamp field of single_played_item is Some()
-        if let Some(ts) = single_played_item.ts.as_ref() {
-            // If the timestamp is able to be parsed into a DateTime<Utc> instance
-            if let Ok(timestamp_dt) = ts.parse::<DateTime<Utc>>() {
-                // If min_date_res and max_date_res are both Ok()
-                if let (Ok(min_date), Ok(max_date)) = (&mut min_date_res, &mut max_date_res) {
-                    // Compare the timestamp with min_date
-                    if timestamp_dt < *min_date {
-                        min_date_res = Ok(timestamp_dt);
-                    }
-                    // Compare the timestamp with max_date
-                    else if timestamp_dt > *max_date {
-                        max_date_res = Ok(timestamp_dt);
-                    }
-                }
-            }
-        }
-    }
-
-    (min_date_res, max_date_res)
+    dt_result
 }
 
-pub fn get_played_items_between_dates(
-    all_played_items: &[PlayItem],
-    start_date: DateTime<Utc>,
-    end_date: DateTime<Utc>,
-) -> Vec<PlayItem> {
-    let mut all_played_items_in_range: Vec<PlayItem> = vec![];
+pub fn get_min_and_max_dates_from_play_items(
+    all_play_items: &Vec<PlayItem>,
+) -> Result<(DateTime<Utc>, DateTime<Utc>), String> {
+    // DOC:
+    let Some(play_item_with_min_datetime) = all_play_items
+        .iter()
+        .clone()
+        .min_by_key(|a| get_datetime_from_play_item(a)) else {
+            return Err("TODO:".to_owned());
+        };
 
-    for single_played_item in all_played_items.iter() {
-        if let Some(ts) = single_played_item.ts.as_ref() {
-            if let Ok(timestamp_dt) = ts.parse::<DateTime<Utc>>() {
-                if start_date <= timestamp_dt && timestamp_dt <= end_date {
-                    all_played_items_in_range.push(single_played_item.clone());
-                }
-            }
-        }
-    }
+    // DOC:
+    let Some(play_item_with_max_datetime) = all_play_items
+        .iter()
+        .clone()
+        .max_by_key(|a| get_datetime_from_play_item(a)) else {
+            return Err("TODO:".to_owned());
+        };
 
-    all_played_items_in_range
+    // DOC:
+    let Some(min_datetime) = get_datetime_from_play_item(play_item_with_min_datetime) else {
+        return Err("TODO:".to_owned());
+    };
+
+    // DOC:
+    let Some(max_datetime) = get_datetime_from_play_item(play_item_with_max_datetime) else {
+        return Err("TODO:".to_owned());
+    };
+
+    Ok((min_datetime, max_datetime))
 }

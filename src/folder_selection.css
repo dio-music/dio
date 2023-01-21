@@ -29,6 +29,10 @@
     margin-top: 20%;
 }
 
+#prompt-above-button {
+    font-size: larger
+}
+
 #folder-selection-button {
     color: var(--white);
     background-color: var(--purple);
