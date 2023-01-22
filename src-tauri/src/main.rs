@@ -3,6 +3,12 @@
     windows_subsystem = "windows"
 )]
 
+#[macro_use]
+extern crate serde_derive;
+
+#[macro_use]
+extern crate erased_serde;
+
 mod dates;
 mod filter;
 mod group;
@@ -11,6 +17,7 @@ mod sort;
 mod util;
 
 use filter::Filter;
+use group::Group;
 use rfd::FileDialog;
 use std::{path::PathBuf, sync::Mutex};
 
@@ -20,7 +27,7 @@ struct DioState {
     spotify_data_folder_path: Option<PathBuf>,
     spotify_plays_data: Vec<plays::PlayItem>,
     filter: filter::Filter,
-    // filtered_data: Mutex<Vec<group1::SpotifyData>>,
+    filtered_data: Vec<Box<dyn Group>>,
 }
 
 impl Default for DioState {
@@ -29,7 +36,7 @@ impl Default for DioState {
             spotify_data_folder_path: None,
             spotify_plays_data: Vec::new(),
             filter: Filter::default(),
-            // filtered_data: Mutex::new(Vec::new()),
+            filtered_data: Vec::new(),
         }
     }
 }
@@ -56,20 +63,31 @@ async fn load_spotify_data(unlocked_state: tauri::State<'_, Dio>) -> Result<(), 
     state.spotify_plays_data = spotify_plays_data;
     state.filter.date_range_boundaries = date_range_boundaries;
 
-    let mut temp = group::get_grouped_data(&state.filter.group_by, &state.spotify_plays_data);
-    sort::sort_grouped_data(&mut temp, sort::SortSpotifyDataBy::TotalListenTime, true);
+    // state.filter.group_by = GroupBy::PodcastEpisode;
 
-    println!("");
+    // let mut temp = group::get_grouped_data(&state.filter.group_by, &state.spotify_plays_data);
+    // sort::sort_grouped_data(&mut temp, sort::SortSpotifyDataBy::TotalListenTime, true);
 
-    for (i, group) in temp.iter().enumerate() {
-        if i == 100 {
-            break;
-        }
+    // println!("");
 
-        println!("{}. {}", i + 1, group);
-    }
+    // for (i, group) in temp.iter().enumerate() {
+    //     if i == 100 {
+    //         break;
+    //     }
+
+    //     println!("{}. {}", i + 1, group);
+    // }
 
     Ok(())
+}
+
+#[tauri::command]
+fn get_filtered_data(unlocked_state: tauri::State<Dio>) -> Result<Vec<Box<dyn Group>>, String> {
+    let Ok(state) = unlocked_state.0.lock() else {
+        return Err("Unable to acquire lock on global state managed by Tauri.".to_owned());
+    };
+
+    Ok(state.filtered_data)
 }
 
 #[tauri::command]
@@ -135,6 +153,7 @@ fn main() {
         .manage(Dio(Mutex::new(DioState::default())))
         .invoke_handler(tauri::generate_handler![
             load_spotify_data,
+            get_filtered_data,
             // apply_filter,
             // reset_filter,
             // set_filter_group

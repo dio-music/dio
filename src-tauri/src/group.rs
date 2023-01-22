@@ -2,7 +2,36 @@ use std::{collections::HashMap, fmt::Display};
 
 use crate::{plays::PlayItem, util};
 
-#[derive(Default)]
+use erased_serde;
+use serde::Serialize;
+
+pub trait Group: Display + Send + erased_serde::Serialize {
+    fn from_play_item(play_item: &PlayItem) -> Result<Self, ()>
+    where
+        Self: Sized;
+
+    fn get_aggregated_data(&self) -> &AggregatedData;
+    fn get_aggregated_data_mut(&mut self) -> &mut AggregatedData;
+    fn get_metadata(&self) -> Vec<MetaDataEntry>;
+
+    fn generate_key(play_item: &PlayItem) -> Result<String, ()>
+    where
+        Self: Sized;
+}
+
+pub enum GroupBy {
+    Album,
+    Artist,
+    Song,
+    Podcast,
+    PodcastEpisode,
+}
+
+/////////////////////
+// AGGREGATED DATA //
+/////////////////////
+
+#[derive(Default, Serialize, Clone, Copy)]
 pub struct AggregatedData {
     pub ms_played: u64,
     pub play_count: u32,
@@ -94,27 +123,9 @@ impl AggregatedData {
     }
 }
 
-pub trait Group: Display {
-    fn from_play_item(play_item: &PlayItem) -> Result<Self, ()>
-    where
-        Self: Sized;
-
-    fn get_aggregated_data(&self) -> &AggregatedData;
-    fn get_aggregated_data_mut(&mut self) -> &mut AggregatedData;
-    fn get_metadata(&self) -> Vec<MetaDataEntry>;
-
-    fn generate_key(play_item: &PlayItem) -> Result<String, ()>
-    where
-        Self: Sized;
-}
-
-pub enum GroupBy {
-    Album,
-    Artist,
-    Song,
-    Podcast,
-    PodcastEpisode,
-}
+/////////////////////
+// METADATA STRUCT //
+/////////////////////
 
 pub enum MetaDataType {
     Album,
@@ -129,6 +140,11 @@ pub struct MetaDataEntry {
     field_data: String,
 }
 
+///////////
+// ALBUM //
+///////////
+
+#[derive(Serialize)]
 pub struct Album {
     album_name: String,
     artist_name: String,
@@ -203,7 +219,7 @@ impl Display for Album {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(
             f,
-            "{} by {}\nTotal Time: {}\nPlays: {}\n",
+            "\"{}\" by \"{}\"\nTotal Time: {}\nPlays: {}\n",
             self.album_name,
             self.artist_name,
             util::get_total_listen_time_from_ms(self.aggregated_data.ms_played),
@@ -212,6 +228,11 @@ impl Display for Album {
     }
 }
 
+////////////
+// ARTIST //
+////////////
+
+#[derive(Serialize)]
 pub struct Artist {
     artist_name: String,
     aggregated_data: AggregatedData,
@@ -267,7 +288,7 @@ impl Display for Artist {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(
             f,
-            "{}\nTotal Time: {}\nPlays: {}\n",
+            "\"{}\"\nTotal Time: {}\nPlays: {}\n",
             self.artist_name,
             util::get_total_listen_time_from_ms(self.aggregated_data.ms_played),
             self.aggregated_data.play_count
@@ -275,6 +296,11 @@ impl Display for Artist {
     }
 }
 
+//////////
+// SONG //
+//////////
+
+#[derive(Serialize)]
 pub struct Song {
     track_name: String,
     album_name: String,
@@ -365,7 +391,7 @@ impl Display for Song {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(
             f,
-            "{} on {} by {}\nTotal Time: {}\nPlays: {}\n",
+            "\"{}\" on \"{}\" by \"{}\"\nTotal Time: {}\nPlays: {}\n",
             self.track_name,
             self.album_name,
             self.artist_name,
@@ -375,6 +401,11 @@ impl Display for Song {
     }
 }
 
+/////////////
+// PODCAST //
+/////////////
+
+#[derive(Serialize)]
 pub struct Podcast {
     podcast_name: String,
     aggregated_data: AggregatedData,
@@ -430,7 +461,7 @@ impl Display for Podcast {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(
             f,
-            "{}\nTotal Time: {}\nPlays: {}\n",
+            "\"{}\"\nTotal Time: {}\nPlays: {}\n",
             self.podcast_name,
             util::get_total_listen_time_from_ms(self.aggregated_data.ms_played),
             self.aggregated_data.play_count
@@ -438,6 +469,11 @@ impl Display for Podcast {
     }
 }
 
+/////////////////////
+// PODCAST EPISODE //
+/////////////////////
+
+#[derive(Serialize)]
 pub struct PodcastEpisode {
     episode_name: String,
     podcast_name: String,
@@ -512,7 +548,7 @@ impl Display for PodcastEpisode {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(
             f,
-            "{} on {}\nTotal Time: {}\nPlays: {}\n",
+            "\"{}\" on \"{}\"\nTotal Time: {}\nPlays: {}\n",
             self.episode_name,
             self.podcast_name,
             util::get_total_listen_time_from_ms(self.aggregated_data.ms_played),
@@ -521,7 +557,9 @@ impl Display for PodcastEpisode {
     }
 }
 
-/////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////
+// GROUPING RAW PlayItems INTO <dyn Group> OBJECTS //
+/////////////////////////////////////////////////////
 
 fn get_key(group_by: &GroupBy, play_item: &PlayItem) -> Result<String, ()> {
     match group_by {
@@ -617,3 +655,5 @@ pub fn get_grouped_data(group_by: &GroupBy, played_items: &Vec<PlayItem>) -> Vec
 
     grouped_data_map.into_values().collect()
 }
+
+serialize_trait_object!(Group);

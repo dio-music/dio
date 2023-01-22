@@ -13,7 +13,7 @@ pub enum SortSpotifyDataBy {
 pub fn sort_grouped_data(
     grouped_data: &mut Vec<Box<dyn group::Group>>,
     sort_by: SortSpotifyDataBy,
-    ascending: bool,
+    descending: bool,
 ) {
     match sort_by {
         SortSpotifyDataBy::TotalListenTime => {
@@ -56,7 +56,7 @@ pub fn sort_grouped_data(
         }
     };
 
-    if ascending {
+    if descending {
         grouped_data.reverse();
     }
 }
