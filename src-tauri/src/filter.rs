@@ -18,6 +18,9 @@ impl Default for Filter {
     }
 }
 
+// TODO: Allow users to do things like "filter for all songs with play count above 100" or
+// "filter for all artists with skip % below 25%", then sort those results with the normal sorts
+
 pub fn get_play_items_between_dates(
     all_play_items: &[PlayItem],
     start_date: DateTime<Utc>,
