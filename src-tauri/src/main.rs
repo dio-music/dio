@@ -11,7 +11,6 @@ mod sort;
 mod util;
 
 use filter::Filter;
-use group::GroupBy;
 use rfd::FileDialog;
 use std::{path::PathBuf, sync::Mutex};
 
@@ -56,6 +55,19 @@ async fn load_spotify_data(unlocked_state: tauri::State<'_, Dio>) -> Result<(), 
     state.spotify_data_folder_path = Some(folder_path);
     state.spotify_plays_data = spotify_plays_data;
     state.filter.date_range_boundaries = date_range_boundaries;
+
+    let mut temp = group::get_grouped_data(&state.filter.group_by, &state.spotify_plays_data);
+    sort::sort_grouped_data(&mut temp, sort::SortSpotifyDataBy::TotalListenTime, true);
+
+    println!("");
+
+    for (i, group) in temp.iter().enumerate() {
+        if i == 100 {
+            break;
+        }
+
+        println!("{}. {}", i + 1, group);
+    }
 
     Ok(())
 }
