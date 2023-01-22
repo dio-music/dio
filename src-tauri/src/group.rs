@@ -3,7 +3,7 @@ use std::{collections::HashMap, fmt::Display};
 
 use crate::{plays::PlayItem, util};
 
-use erased_serde;
+// use erased_serde;
 use serde::Serialize;
 
 // pub trait Group: Display + Send {
@@ -40,7 +40,7 @@ pub enum Group {
     Podcast(GroupData),
     PodcastEpisode(GroupData),
 }
-
+//
 impl Group {
     fn new_album(play_item: &PlayItem) -> Result<Self, ()> {
         let Some(album_name) = play_item.master_metadata_album_album_name.to_owned() else {
