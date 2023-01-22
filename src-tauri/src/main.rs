@@ -27,7 +27,7 @@ struct DioState {
     spotify_data_folder_path: Option<PathBuf>,
     spotify_plays_data: Vec<plays::PlayItem>,
     filter: filter::Filter,
-    filtered_data: Vec<Box<dyn Group>>,
+    // filtered_data: Vec<Box<dyn Group>>,
 }
 
 impl Default for DioState {
@@ -36,7 +36,7 @@ impl Default for DioState {
             spotify_data_folder_path: None,
             spotify_plays_data: Vec::new(),
             filter: Filter::default(),
-            filtered_data: Vec::new(),
+            // filtered_data: Vec::new(),
         }
     }
 }
@@ -81,14 +81,14 @@ async fn load_spotify_data(unlocked_state: tauri::State<'_, Dio>) -> Result<(), 
     Ok(())
 }
 
-#[tauri::command]
-fn get_filtered_data(unlocked_state: tauri::State<Dio>) -> Result<Vec<Box<dyn Group>>, String> {
-    let Ok(state) = unlocked_state.0.lock() else {
-        return Err("Unable to acquire lock on global state managed by Tauri.".to_owned());
-    };
+// #[tauri::command]
+// fn get_filtered_data(unlocked_state: tauri::State<Dio>) -> Result<Vec<Box<dyn Group>>, String> {
+//     let Ok(state) = unlocked_state.0.lock() else {
+//         return Err("Unable to acquire lock on global state managed by Tauri.".to_owned());
+//     };
 
-    Ok(state.filtered_data)
-}
+//     Ok(state.filtered_data)
+// }
 
 #[tauri::command]
 fn apply_filter(unlocked_state: tauri::State<Dio>) -> Result<(), String> {
@@ -153,7 +153,7 @@ fn main() {
         .manage(Dio(Mutex::new(DioState::default())))
         .invoke_handler(tauri::generate_handler![
             load_spotify_data,
-            get_filtered_data,
+            // get_filtered_data,
             // apply_filter,
             // reset_filter,
             // set_filter_group
