@@ -12,6 +12,7 @@
 <body>
   <div id="left-panel">
     <div id="filter-panel">
+      <!-- TODO: Change this h2 into p -->
       <h2 id="filter-panel-heading">Filter</h2>
 
       <div id="show-me-dropdown">
@@ -28,15 +29,24 @@
 
       <div class="date-selector-group" id="start-date-div">
         <!-- TODO: Implement min and max date. Max date must be dynamic based on the end date. -->
-        <label for="start-date">Start Date</label>
+        <label for="start-date">Start Date:</label>
         <input type="date" id="start-date" class="date-input" name="start-date">
       </div>
 
       <div class="date-selector-group" id="end-date-div">
         <!-- TODO: Implement min and max date. Min date must be dynamic based on the start date. -->
-        <label for="end-date">End Date</label>
+        <label for="end-date">End Date:</label>
         <input type="date" id="end-date" class="date-input" name="end-date">
       </div>
+
+      <div class="range-filter" id="filter-total-listen-time">
+        <!-- TODO: double-range slider https://refreshless.com/nouislider/ -->
+      </div>
+      <div class="range-filter" id="filter-play-count"></div>
+      <div class="range-filter" id="filter-click-pct"></div>
+      <div class="range-filter" id="filter-shuffle-pct"></div>
+      <div class="range-filter" id="filter-skip-pct"></div>
+      <div class="range-filter" id="filter-autoplay-pct"></div>
 
       <button type="button" id="reset-filter-button">Reset Filter</button>
     </div>

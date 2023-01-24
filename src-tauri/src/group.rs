@@ -1,4 +1,3 @@
-#[allow(dead_code, unused_variables)]
 use std::{collections::HashMap, fmt::Display};
 
 use serde::Serialize;
@@ -355,7 +354,7 @@ fn update_hash_map_entry(entry: &mut Group, play_item: &PlayItem, ms_played: &u6
     }
 }
 
-pub fn get_grouped_data(group_by: &GroupBy, played_items: &Vec<PlayItem>) -> Vec<Group> {
+pub fn get_grouped_data(group_by: &GroupBy, played_items: Vec<PlayItem>) -> Vec<Group> {
     let mut grouped_data_map: HashMap<String, Group> = HashMap::new();
 
     for play_item in played_items.iter() {

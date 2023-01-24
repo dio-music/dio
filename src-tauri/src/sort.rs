@@ -1,6 +1,7 @@
-use crate::group;
+use crate::group::Group;
 
 /// Enum to represent the different ways that PlayGroup instances can be sorted
+#[derive(Clone)]
 pub enum SortSpotifyDataBy {
     TotalListenTime,
     PlayCount,
@@ -11,7 +12,7 @@ pub enum SortSpotifyDataBy {
 }
 
 pub fn sort_grouped_data(
-    grouped_data: &mut Vec<group::Group>,
+    grouped_data: &mut Vec<Group>,
     sort_by: SortSpotifyDataBy,
     descending: bool,
 ) {

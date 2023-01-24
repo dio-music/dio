@@ -38,6 +38,7 @@ body {
     display: flex;
     flex-direction: column;
     justify-content: center;
+    overflow-y: scroll;
 }
 
 #filter-panel {
@@ -60,11 +61,12 @@ body {
 
 .date-selector-group {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     margin-block: 7.5%;
 }
 
 .date-input {
+    margin-left: 1vw;
     width: fit-content;
     align-self: center;
 }
