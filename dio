@@ -1,3 +1,5 @@
+build () {wasm-pack build;}
+
 if [ "$1" == "init" ]; then
     echo "You must have Rust installed before running init https://www.rust-lang.org/tools/install"
     cargo install wasm-pack
@@ -8,13 +10,14 @@ if [ "$1" == "init" ]; then
     echo "\n\n> Successfully initialized dio."
 
 elif [ "$1" == "build" ]; then
-    wasm-pack build
+    build
 
 elif [ "$1" == "serve" ]; then
+    build
     cd site
     npm run start
 
 else
-    echo "HELP_MSG"
+    echo "TODO: HELP_MSG"
 
 fi

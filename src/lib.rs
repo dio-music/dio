@@ -14,6 +14,6 @@ extern "C" {
 }
 
 #[wasm_bindgen]
-pub fn greet() {
-    alert("Hello, dio!");
+pub fn init() {
+    utils::set_panic_hook();
 }
