@@ -1,0 +1,81 @@
+:root {
+    font-family: Inter, Avenir, Helvetica, Arial, sans-serif;
+    font-size: 16px;
+    line-height: 24px;
+    font-weight: 400;
+
+    --white: #F6F6F6;
+    --dark-grey: #1D201F;
+    --black: #121413;
+    --purple: #6633FF;
+    --pressed-button-text: #D6D6D6;
+    --pressed-button-background: #4321A8;
+
+    color: var(--white);
+    background-color: var(--black);
+
+    font-synthesis: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-text-size-adjust: 100%;
+}
+
+#outer-div {
+    width: auto;
+    height: auto;
+    display: grid;
+    text-align: center;
+    margin-top: 20%;
+}
+
+#prompt-above-button {
+    font-size: larger
+}
+
+#folder-selection-button {
+    color: var(--white);
+    background-color: var(--purple);
+    border: none;
+    border-radius: 12px;
+    padding: 20px;
+    padding-left: 30px;
+    padding-right: 30px;
+    width: auto;
+    font-size: large;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: auto;
+}
+
+/* #folder-selection-button:hover {
+    background-color: #8d53ff;
+} */
+
+#folder-selection-button:active {
+    border: none;
+    color: var(--pressed-button-text);
+    background-color: var(--pressed-button-background);
+}
+
+#status-msg-div {
+    margin-top: 2.5%;
+}
+
+.status-msg {
+    margin-top: 2.5%;
+}
+
+#credit-div {
+    width: auto;
+    height: auto;
+    text-align: center;
+    display: grid;
+}
+
+#credit-msg {
+    position: absolute;
+    bottom: 0;
+    right: 2.5%;
+    font-size: 12px;
+}
