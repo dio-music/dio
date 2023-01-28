@@ -1,0 +1,10 @@
+if [ "$1" == "install" ]; then
+    echo "INSTALL"
+elif [ "$1" == "build" ]; then
+    wasm-pack build
+elif [ "$1" == "serve" ]; then
+    cd site
+    npm run start
+else
+    echo "HELP_MSG"
+fi
