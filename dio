@@ -1,4 +1,6 @@
-build () {wasm-pack build;}
+build () {
+    wasm-pack build;
+}
 
 if [ "$1" == "init" ]; then
     echo "You must have Rust installed before running init https://www.rust-lang.org/tools/install"
