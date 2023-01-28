@@ -77,12 +77,12 @@ pub async fn extract_plays_from_path(base_path: &path::PathBuf) -> Result<Vec<Pl
 
             // Extract a Vec of SongPlay instances from all of the JSON files
             for path in file_paths.iter() {
-                if let Ok(mut single_file_song_plays) = get_song_plays_from_file(path).await {
-                    all_song_plays.append(&mut single_file_song_plays);
-                } else {
-                    // If the file can't be opened, then all of the data is loaded
-                    // TODO: Determine if this is the right behavior
-                    break;
+                let max_retries = 5;
+                for _ in 1..max_retries {
+                    if let Ok(mut single_file_song_plays) = get_song_plays_from_file(path).await {
+                        all_song_plays.append(&mut single_file_song_plays);
+                        break;
+                    }
                 }
             }
 

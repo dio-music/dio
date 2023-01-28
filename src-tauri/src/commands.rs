@@ -14,7 +14,7 @@ pub async fn load_spotify_data(unlocked_state: tauri::State<'_, Dio>) -> Result<
         return Err("Error while attempting to load Spotify data.".to_owned());
     };
 
-    let Ok(date_range_boundaries) = dates::get_min_and_max_dates_from_play_items(&spotify_plays_data) else {
+    let Ok(date_range_boundaries) = dates::get_date_bounds_from_play_items(&spotify_plays_data) else {
         return Err("Unable to find the earliest and latest dates from the Spotify data.".to_owned());
     };
 
@@ -26,6 +26,21 @@ pub async fn load_spotify_data(unlocked_state: tauri::State<'_, Dio>) -> Result<
     state.spotify_plays_data = spotify_plays_data;
     state.filter.date_range_boundaries = date_range_boundaries;
 
+    // JAKE: Testing
+    state.group_by = GroupBy::Song;
+
+    let mut grouped_data =
+        group::get_grouped_data(&state.group_by, state.spotify_plays_data.clone());
+    sort::sort_grouped_data(&mut grouped_data, sort::SortSpotifyDataBy::PlayCount, true);
+
+    println!("");
+    for (i, group) in grouped_data.iter().enumerate() {
+        if i == 25 {
+            break;
+        }
+        println!("{}. {}", i + 1, group);
+    }
+
     Ok(())
 }
 
@@ -34,15 +49,6 @@ pub fn get_processed_data(unlocked_state: tauri::State<Dio>) -> Result<Vec<Group
     let Ok(state) = unlocked_state.0.lock() else {
         return Err("Unable to acquire lock on global state managed by Tauri.".to_owned());
     };
-
-    // JAKE: Testing
-    println!("");
-    for (i, group) in state.processed_data.iter().enumerate() {
-        if i == 10 {
-            break;
-        }
-        println!("{}. {}", i + 1, group);
-    }
 
     Ok(state.processed_data.clone())
 }
@@ -61,7 +67,7 @@ pub fn set_group_by(
         "artists" => GroupBy::Artist,
         "albums" => GroupBy::Album,
         "podcasts" => GroupBy::Podcast,
-        "podcast-episodes" => GroupBy::PodcastEpisode,
+        "podcast_episodes" => GroupBy::PodcastEpisode,
         _ => return Err("Invalid filter group string passed.".to_owned()),
     };
 
@@ -89,8 +95,27 @@ pub fn apply_filters_and_group(unlocked_state: tauri::State<Dio>) -> Result<(), 
 }
 
 #[tauri::command]
-pub fn set_sort(unlocked_state: tauri::State<Dio>) -> Result<(), String> {
-    // TODO:
+pub fn set_sort(
+    unlocked_state: tauri::State<Dio>,
+    new_sort: String,
+    descending: bool,
+) -> Result<(), String> {
+    let Ok(mut state) = unlocked_state.0.lock() else {
+        return Err("Unable to acquire lock on global state managed by Tauri.".to_owned());
+    };
+
+    state.sort_by = match new_sort.as_str() {
+        "auto_play_pct" => SortSpotifyDataBy::AutoPlayPct,
+        "click_pct" => SortSpotifyDataBy::ClickPct,
+        "play_count" => SortSpotifyDataBy::PlayCount,
+        "shuffle_pct" => SortSpotifyDataBy::ShufflePct,
+        "skip_pct" => SortSpotifyDataBy::SkipPct,
+        "total_listening_time" => SortSpotifyDataBy::TotalListenTime,
+        _ => return Err("Invalid sort_by string passed into set_sort()".to_owned()),
+    };
+
+    state.sort_order_descending = descending;
+
     Ok(())
 }
 

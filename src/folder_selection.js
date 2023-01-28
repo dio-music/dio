@@ -1,9 +1,10 @@
 const { invoke } = window.__TAURI__.tauri;
 
 async function load_spotify_data() {
+  document.getElementById("folder-selection-general-status-msg").innerHTML = "Loading..."
+  document.getElementById("folder-selection-extended-status-msg").innerHTML = ""
+
   try {
-    document.getElementById("folder-selection-general-status-msg").innerHTML = "Loading..."
-    document.getElementById("folder-selection-extended-status-msg").innerHTML = ""
     await invoke("load_spotify_data");
     window.location.assign("dashboard.html");
   } catch (err) {

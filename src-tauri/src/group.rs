@@ -364,24 +364,22 @@ pub fn get_grouped_data(group_by: &GroupBy, played_items: Vec<PlayItem>) -> Vec<
             ..
         } = play_item else {continue;};
 
-        let group_result = match group_by {
+        let Ok(group) = (match group_by {
             GroupBy::Album => Group::new_album(play_item),
             GroupBy::Artist => Group::new_artist(play_item),
             GroupBy::Song => Group::new_song(play_item),
             GroupBy::Podcast => Group::new_podcast(play_item),
             GroupBy::PodcastEpisode => Group::new_podcast_episode(play_item),
-        };
-
         // Play items should be skipped if they cannot be successfully turned into a group
-        let Ok(group_for_play_item) = group_result else {continue;};
+        }) else {continue;};
 
-        let key = &group_for_play_item.get_metadata().as_string();
+        let key = group.get_metadata().as_string();
 
-        if !grouped_data_map.contains_key(key) {
-            grouped_data_map.insert(key.clone(), group_for_play_item);
+        if !grouped_data_map.contains_key(&key) {
+            grouped_data_map.insert(key.clone(), group);
         }
 
-        let Some(entry) = grouped_data_map.get_mut(key) else {continue;};
+        let Some(entry) = grouped_data_map.get_mut(&key) else {continue;};
         update_hash_map_entry(entry, play_item, ms_played);
     }
 

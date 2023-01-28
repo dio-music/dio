@@ -13,7 +13,7 @@ fn get_datetime_from_play_item(play_item: &PlayItem) -> Option<DateTime<Utc>> {
     dt_result
 }
 
-pub fn get_min_and_max_dates_from_play_items(
+pub fn get_date_bounds_from_play_items(
     all_play_items: &Vec<PlayItem>,
 ) -> Result<(DateTime<Utc>, DateTime<Utc>), String> {
     // DOC:
