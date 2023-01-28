@@ -2,6 +2,9 @@
 name = "dio"
 version = "0.1.0"
 authors = ["Jake Marchewitz <7871951+jjmarchewitz@users.noreply.github.com>"]
+description = "Your ultimate Spotify companion"
+repository = "https://github.com/dio-music/dio"
+license = "GPL-3.0"
 edition = "2021"
 
 [lib]
@@ -23,9 +26,6 @@ console_error_panic_hook = { version = "0.1.6", optional = true }
 # compared to the default allocator's ~10K. It is slower than the default
 # allocator, however.
 wee_alloc = { version = "0.4.5", optional = true }
-rayon = "1.6.1"
-chrono = "0.4.23"
-tokio = "1.24.2"
 
 [dev-dependencies]
 wasm-bindgen-test = "0.3.13"
