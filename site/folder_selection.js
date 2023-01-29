@@ -1,3 +1,24 @@
+const rust = import('./pkg');
+
+
+
+
+// wasm.init();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 // async function load_spotify_data() {
 //   document.getElementById("folder-selection-general-status-msg").innerHTML = "Loading..."
 //   document.getElementById("folder-selection-extended-status-msg").innerHTML = ""
