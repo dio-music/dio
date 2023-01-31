@@ -12,7 +12,7 @@
    1. `brew install node`
 4. Install wasm-pack with Cargo (Rust's package manager/build tool/packaging and distribution tool. It's amazing.)
    1. `cargo install wasm-pack`
-5. Install the node dependencies for the repo
+5. Install the node dependencies for the repo inside of the `dio` folder
    1. `npm install`
 
 ### Windows
