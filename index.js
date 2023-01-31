@@ -3,6 +3,6 @@
 // will work here one day as well!
 const rust = import('./pkg');
 
-// rust
-//     .then(m => m.greet('World!'))
-//     .catch(console.error);
+rust
+    .then(m => m.greet('World!'))
+    .catch(console.error);

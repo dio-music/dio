@@ -1,0 +1,4 @@
+echo "You must have Rust and Homebrew installed before running this script"
+cargo install wasm-pack
+npm install
+echo "\n\n> Successfully initialized dio."
