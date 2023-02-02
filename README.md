@@ -18,8 +18,5 @@
 
 ## Development
 
-* macOS
-  1. Run `npm run serve` to start the web server. This also compiles your Rust. The first time you execute this should take a long time (minutes)
-  2. Open `localhost:8080` in your favorite browser (except if IE is your favorite. Feel free to leave the project if it is.)
-* Windows
-  1. TODO:
+1. Run `npm run serve` to start the web server. This also compiles your Rust. The first time you execute this should take a long time (minutes)
+2. Open `localhost:8080` in your favorite browser (except if IE is your favorite. Feel free to leave the project if it is.)
