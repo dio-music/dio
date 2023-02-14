@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <base href=".">
+  <link rel="stylesheet" href="folder_selection.css" />
+  <link rel="apple-touch-icon" sizes="180x180" href="assets/icon/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/icon/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="assets/icon/favicon-16x16.png">
+  <link rel="manifest" href="assets/icon/site.webmanifest">
+  <link rel="mask-icon" href="assets/icon/safari-pinned-tab.svg" color="#5bbad5">
+  <meta name="msapplication-TileColor" content="#da532c">
+  <meta name="theme-color" content="#ffffff">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>dio</title>
+  <script type="module" src="folder_selection.js"></script>
+</head>
+
+<body>
+  <div id="outer-div">
+
+    <!-- <p id="prompt-above-button">Open the unzipped folder containing your Spotify data.</p>
+    <button type="button" id="folder-selection-button">
+      Open Folder
+    </button> -->
+
+    <div id="file-select">
+      <label for="file-select-button">Open Folder</label>
+      <input id="file-select-button" type="file">
+    </div>
+
+    <div id="status-msg-div">
+      <p class="status-msg" id="folder-selection-general-status-msg"></p>
+      <p class="status-msg" id="folder-selection-extended-status-msg"></p>
+    </div>
+  </div>
+</body>
+
+</html>

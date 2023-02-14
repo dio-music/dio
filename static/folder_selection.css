@@ -7,7 +7,8 @@
     --white: #F6F6F6;
     --dark-grey: #1D201F;
     --black: #121413;
-    --purple: #6633FF;
+    /* --purple: #6633FF; */
+    --purple: #7956f6;
     --pressed-button-text: #D6D6D6;
     --pressed-button-background: #4321A8;
 
@@ -29,11 +30,11 @@
     margin-top: 20%;
 }
 
-#prompt-above-button {
+/* #prompt-above-button {
     font-size: larger
-}
+} */
 
-#folder-selection-button {
+#file-select {
     color: var(--white);
     background-color: var(--purple);
     border: none;
@@ -46,6 +47,8 @@
     margin-left: auto;
     margin-right: auto;
     margin-bottom: auto;
+    display: flex;
+    flex-direction: column;
 }
 
 /* #folder-selection-button:hover {
@@ -64,18 +67,4 @@
 
 .status-msg {
     margin-top: 2.5%;
-}
-
-#credit-div {
-    width: auto;
-    height: auto;
-    text-align: center;
-    display: grid;
-}
-
-#credit-msg {
-    position: absolute;
-    bottom: 0;
-    right: 2.5%;
-    font-size: 12px;
 }
